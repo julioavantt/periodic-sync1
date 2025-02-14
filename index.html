@@ -14,11 +14,16 @@
    const desregistrarBtn = document.getElementById("desregistrarBtn");
 
    if ("serviceWorker" in navigator) {
-    navigator.permissions
-     .query({ name: "periodic-background-sync" })
-     .then((status) => {
-      console.log(2, status);
-     });
+    if (window.isSecureContext) {
+    // Proceed with navigator.permissions.request()
+    navigator.permissions.request({ name: 'periodic-background-sync' })
+        .then(permissionStatus => { /* ... */ })
+        .catch(error => { /* ... */ });
+} else {
+    console.error("Permissions API requires a secure context (HTTPS)");
+    // Display a message to the user or handle the situation gracefully
+    alert("This feature requires a secure connection (HTTPS).");
+}
 
     navigator.serviceWorker
      .register("service-worker.js")
