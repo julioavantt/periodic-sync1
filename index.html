@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Prueba de Sincronización Periódica en Segundo Plano</title>
+ </head>
+ <body>
+  <h1>Sincronización Periódica en Segundo Plano</h1>
+
+  <button id="registrarBtn">Registrar Sincronización Periódica</button>
+  <button id="desregistrarBtn">Desregistrar Sincronización Periódica</button>
+
+  <script>
+   const registrarBtn = document.getElementById("registrarBtn");
+   const desregistrarBtn = document.getElementById("desregistrarBtn");
+
+   if ("serviceWorker" in navigator) {
+    navigator.permissions
+     .query({ name: "periodic-background-sync" })
+     .then((status) => {
+      console.log(2, status);
+     });
+
+    navigator.serviceWorker
+     .register("service-worker.js")
+     .then((registration) => {
+      console.log("Service Worker registrado:", registration);
+
+      registrarBtn.addEventListener("click", () => {
+       registration.periodicSync
+        .register("mi-tarea-periodica", {
+         minInterval: 10, // Intervalo mínimo de 5 minutos (en milisegundos)
+        })
+        .then(() =>
+         console.log("Tarea de sincronización periódica registrada.")
+        )
+        .catch((error) => console.error("Error al registrar la tarea:", error));
+      });
+
+      desregistrarBtn.addEventListener("click", () => {
+       registration.periodicSync
+        .unregister("mi-tarea-periodica")
+        .then(() =>
+         console.log("Tarea de sincronización periódica desregistrada.")
+        )
+        .catch((error) =>
+         console.error("Error al desregistrar la tarea:", error)
+        );
+      });
+     })
+     .catch((error) =>
+      console.error("Error al registrar el Service Worker:", error)
+     );
+   } else {
+    console.log("Este navegador no soporta Service Workers.");
+   }
+  </script>
+ </body>
+</html>
